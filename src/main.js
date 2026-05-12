@@ -530,11 +530,7 @@ async function bootstrap() {
     console.log('    • Counters tick (scale + color) on value change');
     console.log('    • Deck counter ticks on every draw / refill / replace');
 
-    setStatus(
-      statusEl,
-      `Stage 8 OK — polish: hover lifts, fade-out animations, animated counters. ` +
-        `Make a play to see the full sequence.`
-    );
+    if (statusEl) statusEl.hidden = true;
   } catch (err) {
     console.error('[Wordatro] bootstrap failed', err);
     setStatus(statusEl, `Bootstrap error: ${err.message}`, 'error');
