@@ -4,7 +4,7 @@ export function renderReturnAllButton({ disabled, onClick }) {
   btn.dataset.component = 'return-all-button';
   btn.type = 'button';
   btn.title = 'Return all cards to hand';
-  btn.textContent = '⤺';
+  btn.textContent = 'Return All';
   btn.disabled = !!disabled;
   if (!disabled) {
     btn.addEventListener('click', onClick);

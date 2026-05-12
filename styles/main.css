@@ -67,17 +67,6 @@ body {
   transform: translate(-50%, -50%);
 }
 
-.right-column {
-  position: absolute;
-  right: 28px;
-  top: 42%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  align-items: center;
-}
-
 .left-column {
   position: absolute;
   left: 28px;
@@ -101,9 +90,24 @@ body {
   gap: 14px;
 }
 
+.controls-row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .play-area {
   display: flex;
   justify-content: center;
+}
+
+.returnall-area {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .hand-area {
@@ -323,10 +327,12 @@ body {
 }
 
 .btn--return-all {
-  width: 56px;
-  height: 56px;
-  font-size: 26px;
-  line-height: 1;
+  padding: 10px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-radius: 10px;
 }
 
 .btn--play {
