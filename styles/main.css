@@ -329,10 +329,13 @@ body {
 }
 
 .btn--play {
-  width: 84px;
-  height: 84px;
-  font-size: 38px;
-  line-height: 1;
+  padding: 14px 48px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 12px;
+  border-width: 2px;
   border-color: #2e5418;
   background: linear-gradient(135deg, #7FB069 0%, #5D8A3F 100%);
   color: var(--color-ui-white);

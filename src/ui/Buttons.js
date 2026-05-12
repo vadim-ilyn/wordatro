@@ -18,7 +18,7 @@ export function renderPlayButton({ disabled, onClick }) {
   btn.dataset.component = 'play-button';
   btn.type = 'button';
   btn.title = 'Play hand';
-  btn.textContent = '▶';
+  btn.textContent = 'Play';
   btn.disabled = !!disabled;
   if (!disabled) {
     btn.addEventListener('click', onClick);
