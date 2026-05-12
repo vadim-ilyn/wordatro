@@ -5,7 +5,12 @@ import { determineWinner, calculatePoints } from './game/Scoring.js';
 import { renderPlayerHand } from './ui/PlayerHand.js';
 import { renderWordSlots } from './ui/WordSlots.js';
 import { renderExchanger } from './ui/Exchanger.js';
-import { renderDeckView, updateDeckCounter } from './ui/DeckView.js';
+import {
+  renderDeckView,
+  updateDeckCounter,
+  updateDeckComposition,
+  formatComposition,
+} from './ui/DeckView.js';
 import {
   renderReturnAllButton,
   renderPlayButton,
@@ -400,6 +405,7 @@ function render(state, view) {
   );
 
   updateDeckCounter(view.deckView, state.deck.length, state.totalDeckSize);
+  updateDeckComposition(view.deckView, formatComposition(state.level.categories));
 }
 
 function ensureCounter(view, key, area, factory, updater) {
@@ -451,6 +457,7 @@ async function bootstrap() {
     const deckViewEl = renderDeckView({
       remaining: state.deck.length,
       total: state.totalDeckSize,
+      composition: formatComposition(state.level.categories),
     });
     deckArea.appendChild(deckViewEl);
 

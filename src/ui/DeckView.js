@@ -1,7 +1,15 @@
-export function renderDeckView({ remaining, total }) {
+export function renderDeckView({ remaining, total, composition }) {
   const root = document.createElement('div');
   root.className = 'deck-view';
   root.dataset.component = 'deck-view';
+
+  if (composition) {
+    const label = document.createElement('div');
+    label.className = 'deck-view__composition';
+    label.dataset.component = 'deck-composition';
+    label.textContent = composition;
+    root.appendChild(label);
+  }
 
   const stack = document.createElement('div');
   stack.className = 'deck-view__stack';
@@ -33,4 +41,23 @@ export function updateDeckCounter(deckViewEl, remaining, total) {
     void counter.offsetWidth;
     counter.classList.add('tick');
   }
+}
+
+export function updateDeckComposition(deckViewEl, composition) {
+  const label = deckViewEl.querySelector('[data-component="deck-composition"]');
+  if (!label) return;
+  if (label.textContent !== composition) {
+    label.textContent = composition;
+  }
+}
+
+export function formatComposition(categories) {
+  if (!categories || categories.length === 0) return '';
+  const counts = categories.map((c) => c.wordsIds.length);
+  const allEqual = counts.every((c) => c === counts[0]);
+  if (allEqual) {
+    return `${categories.length} × ${counts[0]} cards`;
+  }
+  const total = counts.reduce((a, b) => a + b, 0);
+  return `${total} cards / ${categories.length} cats`;
 }

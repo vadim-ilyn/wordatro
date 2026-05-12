@@ -902,6 +902,19 @@ body {
   gap: 8px;
 }
 
+.deck-view__composition {
+  padding: 4px 10px;
+  background: var(--color-panel-cream);
+  color: var(--color-accent-dark);
+  border: 2px solid var(--color-accent);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
 .deck-view__stack {
   position: relative;
   width: var(--card-width);
