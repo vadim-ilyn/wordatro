@@ -90,11 +90,24 @@ body {
   z-index: 2;
 }
 
-.hand-area {
+.bottom-stack {
   position: absolute;
   left: 220px;
   right: 220px;
   bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.play-area {
+  display: flex;
+  justify-content: center;
+}
+
+.hand-area {
+  width: 100%;
 }
 
 .deck-area {
