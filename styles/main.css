@@ -179,6 +179,106 @@ body {
   flex: 0 0 auto;
 }
 
+/* ──────────────── LevelSelector ──────────────── */
+
+.level-selector-area {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 5;
+}
+
+.level-selector {
+  position: relative;
+}
+
+.level-selector__chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-panel-cream);
+  border: 2px solid var(--color-accent);
+  border-radius: 10px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.12s ease;
+}
+
+.level-selector__chip:hover {
+  background: var(--color-accent-light);
+}
+
+.level-selector[data-open] .level-selector__chip {
+  background: var(--color-accent-light);
+}
+
+.level-selector__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--color-accent-dark);
+}
+
+.level-selector__value {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.level-selector__caret {
+  color: var(--color-accent-dark);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.level-selector__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--color-panel-cream);
+  border: 2px solid var(--color-accent);
+  border-radius: 10px;
+  min-width: 220px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+
+.level-selector__item {
+  display: block;
+}
+
+.level-selector__item-btn {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+.level-selector__item-btn:hover {
+  background: var(--color-accent-light);
+}
+
+.level-selector__item[data-current] .level-selector__item-btn {
+  font-weight: 800;
+  color: var(--color-accent-dark);
+}
+
+.level-selector__item[data-current] .level-selector__item-btn::after {
+  content: '  ✓';
+}
+
 .boot-status {
   position: absolute;
   left: 16px;

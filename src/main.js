@@ -1,4 +1,4 @@
-import { loadGameConfig, loadLevelConfig } from './game/LevelLoader.js';
+import { loadGameConfig, loadLevelConfig, discoverLevels } from './game/LevelLoader.js';
 import { createGameState, Phase } from './game/GameState.js';
 import { createDeck, drawCards } from './game/Deck.js';
 import { determineWinner, calculatePoints } from './game/Scoring.js';
@@ -27,6 +27,7 @@ import {
   renderLevelCompletePopup,
   renderGameOverPopup,
 } from './ui/Popups.js';
+import { renderLevelSelector } from './ui/LevelSelector.js';
 
 const STARTING_LEVEL_ID = 1;
 const LOSING_MARK_DELAY_MS = 1000;
@@ -88,6 +89,9 @@ function makeHandlers(state, view, gameControl) {
   const isPlayerTurn = () => state.phase === Phase.PLAYER_TURN;
 
   return {
+    onSelectLevel: (id) => gameControl.selectLevel(id),
+    getAvailableLevels: () => gameControl.getAvailableLevels(),
+
     onDropOnSlot: (ctx, slotIndex) => {
       if (!isPlayerTurn()) return;
       if (state.wordSlots[slotIndex] !== null) return;
@@ -325,6 +329,13 @@ function render(state, view) {
   view.handArea.replaceChildren(renderPlayerHand(state, view.handlers));
   view.slotsArea.replaceChildren(renderWordSlots(state, view.handlers));
   view.exchangerArea.replaceChildren(renderExchanger(state, view.handlers));
+  view.levelSelectorArea.replaceChildren(
+    renderLevelSelector({
+      currentLevelId: state.level.id,
+      levels: view.handlers.getAvailableLevels(),
+      onSelect: view.handlers.onSelectLevel,
+    })
+  );
 
   view.playArea.replaceChildren(
     renderPlayButton({
@@ -415,6 +426,7 @@ async function bootstrap() {
   const replaceArea = document.getElementById('replace-area');
   const swapCounterArea = document.getElementById('swap-counter-area');
   const swapSelectionArea = document.getElementById('swap-selection-area');
+  const levelSelectorArea = document.getElementById('level-selector-area');
   setStatus(statusEl, 'Loading configs...');
 
   try {
@@ -455,9 +467,15 @@ async function bootstrap() {
       replaceArea,
       swapCounterArea,
       swapSelectionArea,
+      levelSelectorArea,
       deckView: deckViewEl,
       handlers: null,
     };
+
+    let availableLevels = await discoverLevels();
+    console.log(
+      `[Wordatro] discovered ${availableLevels.length} level(s): ${availableLevels.map((l) => l.id).join(', ')}`
+    );
 
     async function startLevelById(id) {
       try {
@@ -488,6 +506,8 @@ async function bootstrap() {
         }
       },
       restartLevel: () => startLevelById(state.level.id),
+      selectLevel: (id) => startLevelById(id),
+      getAvailableLevels: () => availableLevels,
     };
 
     view.handlers = makeHandlers(state, view, gameControl);

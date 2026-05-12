@@ -14,3 +14,16 @@ export async function loadLevelConfig(levelId, basePath = 'config') {
   }
   return response.json();
 }
+
+export async function discoverLevels(maxProbe = 20, basePath = 'config') {
+  const found = [];
+  for (let i = 1; i <= maxProbe; i++) {
+    try {
+      const config = await loadLevelConfig(i, basePath);
+      found.push({ id: i, targetPoints: config.target_points });
+    } catch {
+      break;
+    }
+  }
+  return found;
+}
