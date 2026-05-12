@@ -179,6 +179,72 @@ body {
   flex: 0 0 auto;
 }
 
+/* ──────────────── Help button + popup ──────────────── */
+
+.help-area {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 5;
+}
+
+.btn--help {
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  border-radius: 10px;
+}
+
+.help-popup {
+  background: var(--color-panel-cream);
+  border: 3px solid var(--color-accent);
+  border-radius: 16px;
+  padding: 28px 36px;
+  text-align: left;
+  max-width: 540px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: endgamePopupIn 0.3s cubic-bezier(0.18, 1.1, 0.45, 1.2);
+}
+
+.help-popup__title {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-accent-dark);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.help-popup__rules {
+  padding-left: 22px;
+  margin: 0 0 22px;
+}
+
+.help-popup__rules li {
+  font-size: 14px;
+  line-height: 1.55;
+  margin-bottom: 8px;
+  color: var(--color-text);
+}
+
+.help-popup__rules li::marker {
+  color: var(--color-accent-dark);
+  font-weight: 800;
+}
+
+.btn--help-close {
+  display: block;
+  margin: 0 auto;
+  padding: 10px 32px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
 /* ──────────────── LevelSelector ──────────────── */
 
 .level-selector-area {

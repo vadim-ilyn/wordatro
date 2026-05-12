@@ -16,6 +16,7 @@ import {
   renderPlayButton,
   renderResetButton,
   renderReplaceButton,
+  renderHelpButton,
 } from './ui/Buttons.js';
 import {
   renderScoreProgressBar,
@@ -31,6 +32,7 @@ import {
   renderScorePopup,
   renderLevelCompletePopup,
   renderGameOverPopup,
+  renderHelpPopup,
 } from './ui/Popups.js';
 import { renderLevelSelector } from './ui/LevelSelector.js';
 
@@ -96,6 +98,9 @@ function makeHandlers(state, view, gameControl) {
   return {
     onSelectLevel: (id) => gameControl.selectLevel(id),
     getAvailableLevels: () => gameControl.getAvailableLevels(),
+    onHelp: () => {
+      view.popupLayer.appendChild(renderHelpPopup({}));
+    },
 
     onDropOnSlot: (ctx, slotIndex) => {
       if (!isPlayerTurn()) return;
@@ -341,6 +346,9 @@ function render(state, view) {
       onSelect: view.handlers.onSelectLevel,
     })
   );
+  view.helpArea.replaceChildren(
+    renderHelpButton({ onClick: view.handlers.onHelp })
+  );
 
   view.playArea.replaceChildren(
     renderPlayButton({
@@ -433,6 +441,7 @@ async function bootstrap() {
   const swapCounterArea = document.getElementById('swap-counter-area');
   const swapSelectionArea = document.getElementById('swap-selection-area');
   const levelSelectorArea = document.getElementById('level-selector-area');
+  const helpArea = document.getElementById('help-area');
   setStatus(statusEl, 'Loading configs...');
 
   try {
@@ -475,6 +484,7 @@ async function bootstrap() {
       swapCounterArea,
       swapSelectionArea,
       levelSelectorArea,
+      helpArea,
       deckView: deckViewEl,
       handlers: null,
     };

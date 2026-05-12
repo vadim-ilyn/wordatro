@@ -53,3 +53,14 @@ export function renderReplaceButton({ disabled, onClick }) {
   }
   return btn;
 }
+
+export function renderHelpButton({ onClick }) {
+  const btn = document.createElement('button');
+  btn.className = 'btn btn--help';
+  btn.dataset.component = 'help-button';
+  btn.type = 'button';
+  btn.title = 'How to play';
+  btn.textContent = 'Help';
+  btn.addEventListener('click', onClick);
+  return btn;
+}

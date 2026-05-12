@@ -95,6 +95,59 @@ export function renderGameOverPopup({ score, target, handsUsed, onRestart }) {
   });
 }
 
+export function renderHelpPopup({ onClose }) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'endgame-backdrop';
+  backdrop.dataset.component = 'help-backdrop';
+
+  const popup = document.createElement('div');
+  popup.className = 'help-popup';
+  popup.dataset.component = 'help-popup';
+
+  const title = document.createElement('h2');
+  title.className = 'help-popup__title';
+  title.textContent = 'How to Play';
+  popup.appendChild(title);
+
+  const rules = document.createElement('ol');
+  rules.className = 'help-popup__rules';
+
+  const items = [
+    'Each card belongs to one of several hidden categories — guess by association.',
+    'Drag cards from your Hand onto the board, then press PLAY.',
+    'Cards from the majority category stay and score; the rest get discarded.',
+    'Points = base (by winning card count) + any +N bonuses on those cards.',
+    'Reach the target Score within your Hands. Use SWAP to discard and redraw.',
+  ];
+
+  for (const text of items) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    rules.appendChild(li);
+  }
+  popup.appendChild(rules);
+
+  const btn = document.createElement('button');
+  btn.className = 'btn btn--help-close';
+  btn.type = 'button';
+  btn.textContent = 'Got it';
+  btn.addEventListener('click', () => {
+    backdrop.remove();
+    if (onClose) onClose();
+  });
+  popup.appendChild(btn);
+
+  backdrop.addEventListener('click', (e) => {
+    if (e.target === backdrop) {
+      backdrop.remove();
+      if (onClose) onClose();
+    }
+  });
+
+  backdrop.appendChild(popup);
+  return backdrop;
+}
+
 function makeEndgamePopup({
   variant,
   componentName,
