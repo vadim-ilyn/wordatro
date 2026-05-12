@@ -14,14 +14,23 @@ import {
 } from './ui/Buttons.js';
 import {
   renderScoreProgressBar,
+  updateScoreProgressBar,
   renderHandsCounter,
+  updateHandsCounter,
   renderSwapCounter,
+  updateSwapCounter,
   renderSwapSelectionCounter,
+  updateSwapSelectionCounter,
 } from './ui/Counters.js';
-import { renderScorePopup } from './ui/Popups.js';
+import {
+  renderScorePopup,
+  renderLevelCompletePopup,
+  renderGameOverPopup,
+} from './ui/Popups.js';
 
 const STARTING_LEVEL_ID = 1;
 const LOSING_MARK_DELAY_MS = 1000;
+const LEAVING_ANIM_MS = 400;
 const SCORE_POPUP_VISIBLE_MS = 3500;
 
 function dealStartingHand(state) {
@@ -29,6 +38,26 @@ function dealStartingHand(state) {
   const drawn = drawCards(state.deck, need);
   state.playerHand.push(...drawn);
   return drawn;
+}
+
+function resetStateForLevel(state, gameConfig, levelConfig, levelId) {
+  state.level = {
+    id: levelId,
+    targetPoints: levelConfig.target_points,
+    categories: levelConfig.categories,
+    bonusPoints: levelConfig.bonus_points,
+  };
+  state.deck = createDeck(levelConfig);
+  state.totalDeckSize = state.deck.length;
+  state.playerHand = [];
+  state.wordSlots = new Array(state.config.playCardsSlotsAmount).fill(null);
+  state.exchanger = [];
+  state.score = 0;
+  state.handsLeft = gameConfig.hands_count;
+  state.replaceAttemptsLeft = gameConfig.replace_attempts_count;
+  state.losingCardIds = new Set();
+  dealStartingHand(state);
+  state.phase = Phase.PLAYER_TURN;
 }
 
 function isBoardEmpty(state) {
@@ -55,7 +84,7 @@ function showScorePopup(view, breakdown) {
   });
 }
 
-function makeHandlers(state, view) {
+function makeHandlers(state, view, gameControl) {
   const isPlayerTurn = () => state.phase === Phase.PLAYER_TURN;
 
   return {
@@ -192,6 +221,12 @@ function makeHandlers(state, view) {
 
       await wait(LOSING_MARK_DELAY_MS);
 
+      const losingEls = view.slotsArea.querySelectorAll(
+        '.word-card[data-losing]'
+      );
+      losingEls.forEach((el) => el.classList.add('leaving'));
+      await wait(LEAVING_ANIM_MS);
+
       for (let i = 0; i < state.wordSlots.length; i++) {
         const c = state.wordSlots[i];
         if (c && state.losingCardIds.has(c.id)) {
@@ -218,6 +253,10 @@ function makeHandlers(state, view) {
         scoreAfter,
         winningCards: winner.cards,
       });
+
+      const winnerEls = view.slotsArea.querySelectorAll('.word-card');
+      winnerEls.forEach((el) => el.classList.add('leaving'));
+      await wait(LEAVING_ANIM_MS);
 
       state.score = scoreAfter;
 
@@ -253,6 +292,26 @@ function makeHandlers(state, view) {
       console.groupEnd();
 
       render(state, view);
+
+      if (state.phase === Phase.LEVEL_COMPLETE) {
+        view.popupLayer.appendChild(
+          renderLevelCompletePopup({
+            score: state.score,
+            target: state.level.targetPoints,
+            levelId: state.level.id,
+            onNextLevel: () => gameControl.startNextLevel(),
+          })
+        );
+      } else if (state.phase === Phase.GAME_OVER) {
+        view.popupLayer.appendChild(
+          renderGameOverPopup({
+            score: state.score,
+            target: state.level.targetPoints,
+            handsUsed: state.config.handsCount,
+            onRestart: () => gameControl.restartLevel(),
+          })
+        );
+      }
     },
   };
 }
@@ -292,26 +351,53 @@ function render(state, view) {
     })
   );
 
-  view.scoreArea.replaceChildren(
-    renderScoreProgressBar({
-      score: state.score,
-      target: state.level.targetPoints,
-    })
+  ensureCounter(
+    view,
+    'scoreBarEl',
+    view.scoreArea,
+    () => renderScoreProgressBar({ score: state.score, target: state.level.targetPoints }),
+    (el) => updateScoreProgressBar(el, { score: state.score, target: state.level.targetPoints })
   );
-  view.handsArea.replaceChildren(
-    renderHandsCounter({ handsLeft: state.handsLeft })
+  ensureCounter(
+    view,
+    'handsCounterEl',
+    view.handsArea,
+    () => renderHandsCounter({ handsLeft: state.handsLeft }),
+    (el) => updateHandsCounter(el, { handsLeft: state.handsLeft })
   );
-  view.swapCounterArea.replaceChildren(
-    renderSwapCounter({ swapAttemptsLeft: state.replaceAttemptsLeft })
+  ensureCounter(
+    view,
+    'swapCounterEl',
+    view.swapCounterArea,
+    () => renderSwapCounter({ swapAttemptsLeft: state.replaceAttemptsLeft }),
+    (el) => updateSwapCounter(el, { swapAttemptsLeft: state.replaceAttemptsLeft })
   );
-  view.swapSelectionArea.replaceChildren(
-    renderSwapSelectionCounter({
-      current: state.exchanger.length,
-      max: state.config.maxCardsReplaceCount,
-    })
+  ensureCounter(
+    view,
+    'swapSelectionEl',
+    view.swapSelectionArea,
+    () =>
+      renderSwapSelectionCounter({
+        current: state.exchanger.length,
+        max: state.config.maxCardsReplaceCount,
+      }),
+    (el) =>
+      updateSwapSelectionCounter(el, {
+        current: state.exchanger.length,
+        max: state.config.maxCardsReplaceCount,
+      })
   );
 
   updateDeckCounter(view.deckView, state.deck.length, state.totalDeckSize);
+}
+
+function ensureCounter(view, key, area, factory, updater) {
+  if (!view[key]) {
+    view[key] = factory();
+    area.appendChild(view[key]);
+  } else {
+    updater(view[key]);
+  }
 }
 
 async function bootstrap() {
@@ -372,7 +458,39 @@ async function bootstrap() {
       deckView: deckViewEl,
       handlers: null,
     };
-    view.handlers = makeHandlers(state, view);
+
+    async function startLevelById(id) {
+      try {
+        const config = await loadLevelConfig(id);
+        resetStateForLevel(state, gameConfig, config, id);
+        console.log(
+          `[Wordatro] Started level ${id}: target=${state.level.targetPoints}, deck=${state.totalDeckSize}, hands=${state.handsLeft}`
+        );
+        render(state, view);
+        return true;
+      } catch (err) {
+        console.warn(
+          `[Wordatro] Could not load level ${id}: ${err.message}`
+        );
+        return false;
+      }
+    }
+
+    const gameControl = {
+      startNextLevel: async () => {
+        const nextId = state.level.id + 1;
+        const ok = await startLevelById(nextId);
+        if (!ok) {
+          console.log(
+            '[Wordatro] No more levels — restarting from level 1'
+          );
+          await startLevelById(1);
+        }
+      },
+      restartLevel: () => startLevelById(state.level.id),
+    };
+
+    view.handlers = makeHandlers(state, view, gameControl);
 
     render(state, view);
 
@@ -380,18 +498,22 @@ async function bootstrap() {
     window.view = view;
     window.render = () => render(state, view);
 
-    console.log('[Wordatro] Stage 6 ready');
+    console.log('[Wordatro] Stage 8 ready (Polish)');
     console.log(
-      `  hand: ${state.playerHand.length}, deck: ${state.deck.length}/${state.totalDeckSize}, target: ${state.level.targetPoints}, hands: ${state.handsLeft}, swap attempts: ${state.replaceAttemptsLeft}, max per swap: ${state.config.maxCardsReplaceCount}`
+      `  level ${state.level.id}, target ${state.level.targetPoints}, hands ${state.handsLeft}, swap attempts ${state.replaceAttemptsLeft}, deck ${state.deck.length}/${state.totalDeckSize}`
     );
-    console.log(
-      '  Try: drag a card to the left Exchanger box, click ↻ to return all, or Replace to discard + draw.'
-    );
+    console.log('  Polish added:');
+    console.log('    • Card hover lift (in hand) / scale (on board)');
+    console.log('    • Losers fade-out 400ms after × marker');
+    console.log('    • Winners fade-out 400ms after Score popup closes');
+    console.log('    • Score bar fill smoothly animates to new value');
+    console.log('    • Counters tick (scale + color) on value change');
+    console.log('    • Deck counter ticks on every draw / refill / replace');
 
     setStatus(
       statusEl,
-      `Stage 6 OK — left column: Swap counter / Reset / Exchanger / Selected / Replace. ` +
-        `Drop cards into exchanger, then press Replace.`
+      `Stage 8 OK — polish: hover lifts, fade-out animations, animated counters. ` +
+        `Make a play to see the full sequence.`
     );
   } catch (err) {
     console.error('[Wordatro] bootstrap failed', err);

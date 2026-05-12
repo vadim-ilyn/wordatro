@@ -68,3 +68,83 @@ function makeRow(label, value) {
   row.appendChild(valueEl);
   return row;
 }
+
+export function renderLevelCompletePopup({ score, target, levelId, onNextLevel }) {
+  return makeEndgamePopup({
+    variant: 'win',
+    componentName: 'level-complete-popup',
+    icon: '🎉',
+    title: 'Level Complete',
+    subtitle: `Score: ${score} / ${target}`,
+    extra: `Level ${levelId} cleared`,
+    buttonLabel: 'Next Level',
+    onAction: onNextLevel,
+  });
+}
+
+export function renderGameOverPopup({ score, target, handsUsed, onRestart }) {
+  return makeEndgamePopup({
+    variant: 'lose',
+    componentName: 'game-over-popup',
+    icon: '💀',
+    title: 'Game Over',
+    subtitle: `Score: ${score} / ${target}`,
+    extra: `${handsUsed} hand${handsUsed === 1 ? '' : 's'} used — target not reached`,
+    buttonLabel: 'Restart',
+    onAction: onRestart,
+  });
+}
+
+function makeEndgamePopup({
+  variant,
+  componentName,
+  icon,
+  title,
+  subtitle,
+  extra,
+  buttonLabel,
+  onAction,
+}) {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'endgame-backdrop';
+  backdrop.dataset.component = `endgame-backdrop-${variant}`;
+
+  const popup = document.createElement('div');
+  popup.className = `endgame-popup endgame-popup--${variant}`;
+  popup.dataset.component = componentName;
+
+  const iconEl = document.createElement('div');
+  iconEl.className = 'endgame-popup__icon';
+  iconEl.textContent = icon;
+  popup.appendChild(iconEl);
+
+  const titleEl = document.createElement('h2');
+  titleEl.className = 'endgame-popup__title';
+  titleEl.textContent = title;
+  popup.appendChild(titleEl);
+
+  const subtitleEl = document.createElement('div');
+  subtitleEl.className = 'endgame-popup__subtitle';
+  subtitleEl.textContent = subtitle;
+  popup.appendChild(subtitleEl);
+
+  if (extra) {
+    const extraEl = document.createElement('div');
+    extraEl.className = 'endgame-popup__extra';
+    extraEl.textContent = extra;
+    popup.appendChild(extraEl);
+  }
+
+  const btn = document.createElement('button');
+  btn.className = `btn btn--endgame btn--endgame-${variant}`;
+  btn.type = 'button';
+  btn.textContent = buttonLabel;
+  btn.addEventListener('click', () => {
+    backdrop.remove();
+    onAction();
+  });
+  popup.appendChild(btn);
+
+  backdrop.appendChild(popup);
+  return backdrop;
+}

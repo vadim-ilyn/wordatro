@@ -25,5 +25,12 @@ export function renderDeckView({ remaining, total }) {
 
 export function updateDeckCounter(deckViewEl, remaining, total) {
   const counter = deckViewEl.querySelector('[data-component="deck-counter"]');
-  if (counter) counter.textContent = `${remaining}/${total}`;
+  if (!counter) return;
+  const newText = `${remaining}/${total}`;
+  if (counter.textContent !== newText) {
+    counter.textContent = newText;
+    counter.classList.remove('tick');
+    void counter.offsetWidth;
+    counter.classList.add('tick');
+  }
 }
