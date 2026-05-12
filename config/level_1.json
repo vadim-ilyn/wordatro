@@ -1,0 +1,71 @@
+{
+    "target_points":100,
+    "categories": [
+        {
+            "categoryId": "Shapes",
+            "wordsIds": [
+                "Circle",
+                "Triangle",
+                "Rectangle",
+                "Rhombus",
+                "Square",
+                "Hexagon",
+                "Ellipse",
+                "Trapezoid"
+            ]
+        },
+        {
+            "categoryId": "Language",
+            "wordsIds": [
+                "English",
+                "Italian",
+                "Hindi",
+                "Japanese",
+                "Hebrew",
+                "Danish",
+                "Latin",
+                "Polish"
+            ]
+        },
+        {
+            "categoryId": "France",
+            "wordsIds": [
+                "Paris",
+                "Cuisine",
+                "Eiffel",
+                "Beret",
+                "Louvre",
+                "Amelie",
+                "Napoleon",
+                "Bordeaux"
+            ]
+        },
+        {
+            "categoryId": "Western",
+            "wordsIds": [
+                "Horses",
+                "Cowboys",
+                "Lasso",
+                "Chase",
+                "Saloon",
+                "Sheriff",
+                "Prairie",
+                "Cacti"
+            ]
+        },
+        {
+            "categoryId": "24 hours",
+            "wordsIds": [
+                "Night",
+                "Evening",
+                "Morning",
+                "Noon",
+                "Dawn",
+                "Midday",
+                "Midnight",
+                "Twilight"
+            ]
+        }
+    ],
+    "bonus_points":[20,30,20,50,10,10,10,10,10,10]
+}
