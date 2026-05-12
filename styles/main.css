@@ -14,6 +14,9 @@
 
   --card-width: 140px;
   --card-aspect: 3 / 4;
+
+  --hand-capacity: 8;
+  --hand-gap: 10px;
 }
 
 * {
@@ -81,9 +84,14 @@ body {
 
 .bottom-stack {
   position: absolute;
-  left: 220px;
-  right: 220px;
+  left: 50%;
   bottom: 24px;
+  transform: translateX(-50%);
+  width: calc(
+    var(--hand-capacity) * var(--card-width)
+    + (var(--hand-capacity) - 1) * var(--hand-gap)
+    + 42px
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -126,17 +134,17 @@ body {
 /* ──────────────── PlayerHand ──────────────── */
 
 .player-hand {
-  background: var(--color-ui-white);
+  background: #2a1f38;
   border: 3px solid var(--color-ui-purple);
   border-radius: 12px;
   padding: 14px 18px 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 }
 
 .player-hand__label {
   font-size: 14px;
   font-weight: 700;
-  color: var(--color-ui-purple);
+  color: var(--color-card-border);
   letter-spacing: 1px;
   text-transform: uppercase;
   margin-bottom: 10px;
@@ -145,7 +153,7 @@ body {
 .player-hand__cards {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  gap: var(--hand-gap);
   align-items: flex-end;
   justify-content: center;
   min-height: calc(var(--card-width) * 4 / 3);
